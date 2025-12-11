@@ -72,12 +72,12 @@ public:
     }
 
     void parseCSV(const std::vector<std::string>& cols) override {
-        // cols[5] = hourlyRate, cols[6] = hoursWorked
-        if (cols.size() > 5) {
-            try { hourlyRate_ = std::stod(cols[5]); } catch (...) { hourlyRate_ = 0; }
-        }
+        // cols[6] = hourlyRate, cols[7] = hoursWorked
         if (cols.size() > 6) {
-            try { hoursWorked_ = std::stod(cols[6]); } catch (...) { hoursWorked_ = 0; }
+            try { hourlyRate_ = std::stod(cols[6]); } catch (...) { hourlyRate_ = 0; }
+        }
+        if (cols.size() > 7) {
+            try { hoursWorked_ = std::stod(cols[7]); } catch (...) { hoursWorked_ = 0; }
         }
     }
 };

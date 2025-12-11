@@ -33,9 +33,10 @@ void showMenu() {
               << "║  6. 工资统计及占比                   ║\n"
               << "║  7. 全员提级                         ║\n"
               << "║  8. 业绩排名                         ║\n"
+              << "║  9. 生日提醒                         ║\n"
               << "║  0. 退出系统                         ║\n"
               << "╚══════════════════════════════════════╝\n"
-              << "请选择(0-8): ";
+              << "请选择(0-9): ";
     std::cout.flush();
 }
 
@@ -45,10 +46,6 @@ int main() {
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);
 #endif
-
-    // 设置 I/O
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(&std::cout);
 
     // 确定数据文件路径
     std::string csvPath = "data/employees.csv";
@@ -73,7 +70,14 @@ int main() {
         showMenu();
         
         std::string choice;
-        std::getline(std::cin, choice);
+        if (!std::getline(std::cin, choice)) {
+            // 输入流失败，清理并重试
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            continue;
+        }
+
+        if (choice.empty()) continue;
 
         if (choice == "1") {
             manager.addEmployee();
@@ -91,6 +95,8 @@ int main() {
             manager.promoteAll();
         } else if (choice == "8") {
             manager.ranking();
+        } else if (choice == "9") {
+            manager.birthdayReminder();
         } else if (choice == "0" || choice == "q" || choice == "Q") {
             break;
         } else {

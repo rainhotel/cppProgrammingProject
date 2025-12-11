@@ -64,9 +64,9 @@ public:
     }
 
     void parseCSV(const std::vector<std::string>& cols) override {
-        // cols[5] = fixedSalary (baseSalary 列)
-        if (cols.size() > 5) {
-            try { fixedSalary_ = std::stod(cols[5]); } catch (...) { fixedSalary_ = 0; }
+        // cols[6] = fixedSalary (baseSalary 列)
+        if (cols.size() > 6) {
+            try { fixedSalary_ = std::stod(cols[6]); } catch (...) { fixedSalary_ = 0; }
         }
     }
 };

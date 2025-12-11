@@ -72,6 +72,7 @@ public:
             int level = 1;
             try { level = std::stoi(cols[3]); } catch (...) {}
             std::string gender = cols[4];
+            std::string birthday = (cols.size() > 5) ? cols[5] : "";
 
             // 根据角色创建对应的派生类对象
             std::unique_ptr<Employee> emp = createEmployeeByRole(role);
@@ -81,6 +82,7 @@ public:
             emp->setName(name);
             emp->setGender(gender);
             emp->setLevel(level);
+            emp->setBirthday(birthday);
             emp->parseCSV(cols);
 
             employees_.push_back(std::move(emp));
@@ -99,7 +101,7 @@ public:
         }
 
         // 写入表头
-        out << "id,name,role,level,gender,param1,param2,param3\n";
+        out << "id,name,role,level,gender,birthday,param1,param2,param3\n";
         
         for (const auto& emp : employees_) {
             out << emp->toCSV() << "\n";
@@ -376,6 +378,88 @@ public:
                       << std::fixed << std::setprecision(2) << emp->calculateSalary() << " 元" << std::endl;
         }
         std::cout << "=======================================" << std::endl;
+    }
+
+    // 生日提醒功能
+    void birthdayReminder() const {
+        if (employees_.empty()) {
+            std::cout << "当前没有员工记录。" << std::endl;
+            return;
+        }
+
+        // 获取当前日期
+        std::cout << "请输入当前日期(格式YYYY-MM-DD, 如2025-12-11): ";
+        std::cout.flush();
+        std::string currentDate;
+        std::getline(std::cin, currentDate);
+
+        if (!Employee::isValidDate(currentDate)) {
+            std::cout << "日期格式错误。" << std::endl;
+            return;
+        }
+
+        std::string currentMonthDay = currentDate.substr(5, 5); // MM-DD
+        int currentMonth = 0, currentDay = 0;
+        try {
+            currentMonth = std::stoi(currentDate.substr(5, 2));
+            currentDay = std::stoi(currentDate.substr(8, 2));
+        } catch (...) {
+            std::cout << "日期解析错误。" << std::endl;
+            return;
+        }
+
+        std::cout << "\n请输入提醒天数范围(如7表示未来7天内): ";
+        std::cout.flush();
+        std::string daysStr;
+        std::getline(std::cin, daysStr);
+        int reminderDays = 7;
+        try { reminderDays = std::stoi(daysStr); } catch (...) {}
+
+        std::vector<const Employee*> upcomingBirthdays;
+
+        for (const auto& emp : employees_) {
+            std::string birthday = emp->getBirthday();
+            if (birthday.empty() || birthday.length() < 10) continue;
+
+            std::string birthMonthDay = birthday.substr(5, 5); // MM-DD
+            int birthMonth = 0, birthDay = 0;
+            try {
+                birthMonth = std::stoi(birthday.substr(5, 2));
+                birthDay = std::stoi(birthday.substr(8, 2));
+            } catch (...) {
+                continue;
+            }
+
+            // 简化逻辑：只比较月和日，计算天数差
+            int currentDayOfYear = currentMonth * 31 + currentDay;
+            int birthDayOfYear = birthMonth * 31 + birthDay;
+            
+            // 如果生日已过今年，算作明年
+            if (birthDayOfYear < currentDayOfYear) {
+                birthDayOfYear += 365;
+            }
+
+            int daysUntilBirthday = birthDayOfYear - currentDayOfYear;
+            
+            if (daysUntilBirthday >= 0 && daysUntilBirthday <= reminderDays) {
+                upcomingBirthdays.push_back(emp.get());
+            }
+        }
+
+        if (upcomingBirthdays.empty()) {
+            std::cout << "\n未来 " << reminderDays << " 天内没有员工生日。" << std::endl;
+        } else {
+            std::cout << "\n========== 生日提醒 (未来" << reminderDays << "天内) ==========" << std::endl;
+            for (const auto* emp : upcomingBirthdays) {
+                std::string birthday = emp->getBirthday();
+                std::string birthMonthDay = birthday.substr(5, 5);
+                std::cout << "员工: " << emp->getName() 
+                          << " (编号: " << emp->getId() << ")"
+                          << " | 生日: " << birthMonthDay 
+                          << " | 岗位: " << emp->getRoleName() << std::endl;
+            }
+            std::cout << "======================================" << std::endl;
+        }
     }
 
     // ========== 辅助 ==========

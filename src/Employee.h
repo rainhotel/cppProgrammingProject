@@ -17,6 +17,7 @@ protected:
     std::string name_;
     std::string gender_;  // "男" 或 "女"
     int level_;
+    std::string birthday_; // 生日，格式：YYYY-MM-DD
 
 public:
     Employee() : id_(0), level_(1) {}
@@ -37,6 +38,9 @@ public:
     
     int getLevel() const { return level_; }
     void setLevel(int level) { level_ = level; }
+    
+    std::string getBirthday() const { return birthday_; }
+    void setBirthday(const std::string& birthday) { birthday_ = birthday; }
 
     // ========== 纯虚函数（派生类必须实现） ==========
     
@@ -89,6 +93,31 @@ public:
         } catch (...) {
             level_ = 1;
         }
+        
+        while (true) {
+            std::cout << "生日(格式YYYY-MM-DD, 如1990-05-20): ";
+            std::cout.flush();
+            std::getline(std::cin, birthday_);
+            if (birthday_.empty() || isValidDate(birthday_)) break;
+            std::cout << "日期格式错误，请按YYYY-MM-DD格式输入。" << std::endl;
+        }
+    }
+    
+    // 验证日期格式
+    static bool isValidDate(const std::string& date) {
+        if (date.length() != 10) return false;
+        if (date[4] != '-' || date[7] != '-') return false;
+        try {
+            int year = std::stoi(date.substr(0, 4));
+            int month = std::stoi(date.substr(5, 2));
+            int day = std::stoi(date.substr(8, 2));
+            if (year < 1900 || year > 2100) return false;
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+            return true;
+        } catch (...) {
+            return false;
+        }
     }
 
 protected:
@@ -96,7 +125,7 @@ protected:
     std::string basicToCSV() const {
         std::ostringstream oss;
         oss << id_ << "," << name_ << "," << getRoleName() << ","
-            << level_ << "," << gender_;
+            << level_ << "," << gender_ << "," << birthday_;
         return oss.str();
     }
 
@@ -106,6 +135,7 @@ protected:
                   << "姓名: " << name_ << "\n"
                   << "性别: " << gender_ << "\n"
                   << "级别: " << level_ << "\n"
+                  << "生日: " << (birthday_.empty() ? "未设置" : birthday_) << "\n"
                   << "岗位: " << getRoleName() << "\n";
     }
 };
