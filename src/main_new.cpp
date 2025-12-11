@@ -47,6 +47,41 @@ int main() {
     SetConsoleCP(65001);
 #endif
 
+    std::cout << "╔══════════════════════════════════════╗\n"
+              << "║     企业人力管理系统 - 登录          ║\n"
+              << "╚══════════════════════════════════════╝\n";
+
+    // 管理员登录验证
+    const std::string ADMIN_PASSWORD = "admin123";
+    int loginAttempts = 0;
+    const int MAX_ATTEMPTS = 3;
+    bool loginSuccess = false;
+
+    while (loginAttempts < MAX_ATTEMPTS && !loginSuccess) {
+        std::cout << "\n请输入管理员密码: ";
+        std::cout.flush();
+        std::string inputPassword;
+        std::getline(std::cin, inputPassword);
+
+        if (inputPassword == ADMIN_PASSWORD) {
+            loginSuccess = true;
+            std::cout << "登录成功！欢迎使用系统。\n" << std::endl;
+        } else {
+            loginAttempts++;
+            if (loginAttempts < MAX_ATTEMPTS) {
+                std::cout << "密码错误！剩余尝试次数: " << (MAX_ATTEMPTS - loginAttempts) << std::endl;
+            } else {
+                std::cout << "登录失败次数过多，系统退出。" << std::endl;
+#ifdef _WIN32
+                std::cout << "按回车键关闭窗口..." << std::endl;
+                std::string dummy;
+                std::getline(std::cin, dummy);
+#endif
+                return 1;
+            }
+        }
+    }
+
     // 确定数据文件路径
     std::string csvPath = "data/employees.csv";
     {
