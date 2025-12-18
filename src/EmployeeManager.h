@@ -29,8 +29,6 @@ public:
     explicit EmployeeManager(const std::string& csvPath) 
         : nextId_(1), csvPath_(csvPath) {}
 
-    // ========== 持久化 ==========
-
     // 从 CSV 文件加载
     void load() {
         employees_.clear();
@@ -110,7 +108,6 @@ public:
         std::cout << "数据已保存。" << std::endl;
     }
 
-    // ========== 员工创建工厂 ==========
 
     static std::unique_ptr<Employee> createEmployeeByRole(const std::string& role) {
         if (role == "Manager") {
